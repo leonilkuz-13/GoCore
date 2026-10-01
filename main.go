@@ -11,17 +11,10 @@ import (
 	"time"
 )
 
-type Flags struct {
-	From    int
-	To      int
-	Workers int
-	Timeout time.Duration
-}
-
 func LoadFlags() Flags {
 	from := flag.Int("from", -1, "ID of the first movie (mandatory)")
-	to := flag.Int("to", -1, "id последнего фильма")
-	workers := flag.Int("workers", 10, "number of workers in the worker pool (mandatory)")
+	to := flag.Int("to", -1, "id of the last movie (mandatory)")
+	workers := flag.Int("workers", 10, "number of workers in the worker pool")
 	timeout := flag.Duration("timeout", 5*time.Second, "HTTP request timeout")
 
 	flag.Parse()
