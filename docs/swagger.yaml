@@ -1,0 +1,115 @@
+basePath: /
+definitions:
+  http.ErrorResponse:
+    properties:
+      error:
+        example: invalid request
+        type: string
+    type: object
+  http.MovieResponse:
+    properties:
+      director:
+        example: Director name
+        type: string
+      id:
+        example: 1
+        type: integer
+      title:
+        example: Movie title
+        type: string
+      year:
+        example: 2024
+        type: integer
+    type: object
+  http.MovieResultResponse:
+    properties:
+      error:
+        example: movie unavailable
+        type: string
+      id:
+        example: 1
+        type: integer
+      movie:
+        $ref: '#/definitions/http.MovieResponse'
+    type: object
+info:
+  contact: {}
+  description: HTTP API for loading movies from an external movie service.
+  title: GoCore Movie API
+  version: "1.0"
+paths:
+  /last-movie:
+    get:
+      description: Finds and returns the last available movie on the external service.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.MovieResponse'
+        "404":
+          description: Movie not found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "502":
+          description: External movie service error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "504":
+          description: External movie service timeout
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Get the last available movie
+      tags:
+      - movies
+  /load-movies:
+    get:
+      description: Loads movies from the external service in the inclusive range [from,
+        to]. Per-movie failures are returned in the corresponding array items.
+      parameters:
+      - description: First movie ID (at least 1)
+        in: query
+        minimum: 1
+        name: from
+        required: true
+        type: integer
+      - description: Last movie ID (greater than or equal to from)
+        in: query
+        minimum: 1
+        name: to
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/http.MovieResultResponse'
+            type: array
+        "400":
+          description: Invalid from or to
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "502":
+          description: External movie service error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "504":
+          description: External movie service timeout
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Load movies by ID range
+      tags:
+      - movies
+swagger: "2.0"
