@@ -15,8 +15,8 @@ import (
 	_ "github.com/leonilkuz-13/GoCore/docs"
 	"github.com/leonilkuz-13/GoCore/internal/adapter"
 	"github.com/leonilkuz-13/GoCore/internal/config"
+	movieGRPC "github.com/leonilkuz-13/GoCore/internal/handler/grpc"
 	movieHTTP "github.com/leonilkuz-13/GoCore/internal/handler/http"
-	movieGRPC "github.com/leonilkuz-13/GoCore/internal/transport/grpc"
 	"github.com/leonilkuz-13/GoCore/internal/usecase"
 	"google.golang.org/grpc"
 )
@@ -32,8 +32,12 @@ func main() {
 }
 
 func run() error {
-	cfg := config.Load()
-	movieClient := adapter.NewMovieClient(cfg.MovieBaseURL, cfg.MovieRequestTimeout)
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatalf("load config: %v", err)
+	}
+
+	movieClient := adapter.NewMovieClient(cfg.MovieBaseURL, cfg.RequestTimeout)
 	movieService := usecase.NewMovieUsecase(movieClient, cfg.MaxConcurrency)
 
 	httpServer := &http.Server{
